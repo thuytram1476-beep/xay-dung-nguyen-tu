@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Xây dựng nguyên tử – Mô hình Rutherford – Bohr</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#f4f6f3;--panel:#fff;--ink:#17202a;--muted:#5a6672;--line:#d7dde2;--p:#d64545;--n:#8c96a1;--e:#2563eb;--accent:#0f766e;--ok:#15803d;--bad:#b42318;color-scheme:light dark;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e141b;--panel:#161e28;--ink:#e8edf2;--muted:#9aa7b4;--line:#27333f;--p:#ef6b6b;--n:#a3adb8;--e:#6aa5ff;--accent:#2dd4bf;--ok:#4ade80;--bad:#f87171}}
+:root[data-theme="dark"]{--bg:#0e141b;--panel:#161e28;--ink:#e8edf2;--muted:#9aa7b4;--line:#27333f;--p:#ef6b6b;--n:#a3adb8;--e:#6aa5ff;--accent:#2dd4bf;--ok:#4ade80;--bad:#f87171}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+.wrap{max-width:1040px;margin:0 auto;padding:16px}
+h1{font-size:1.25rem;margin:4px 0 2px}
+.sub{color:var(--muted);margin:0 0 14px;font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.stage svg{width:100%;height:auto;display:block;max-height:78vh}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.row:last-of-type{border-bottom:0}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:8px;vertical-align:-1px}
+.ctl{display:flex;align-items:center;gap:8px}
+.ctl output{min-width:2ch;text-align:center;font-weight:700;font-size:1.1rem}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;min-height:44px;min-width:44px;padding:0 12px}
+button:hover{border-color:var(--accent)}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button.pri{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+.info{display:flex;gap:14px;align-items:center;margin:4px 0 10px}
+.tile{width:92px;height:92px;border:2px solid var(--ink);border-radius:8px;position:relative;display:grid;place-items:center;flex:none}
+.tile b{font-size:2.2rem;line-height:1}
+.tile i{position:absolute;font-style:normal;font-size:.8rem;color:var(--muted)}
+.tile .a{top:4px;left:6px}.tile .z{bottom:4px;left:6px}.tile .c{top:4px;right:6px;font-weight:700;color:var(--ink)}
+.meta{font-size:.92rem}
+.meta div{margin:2px 0}
+.status{margin:10px 0 0;font-weight:600}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.quest{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.msg{min-height:1.5em;font-weight:600}
+.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+.empty{fill:var(--muted);font-size:15px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Xây dựng nguyên tử</h1>
+  <p class="sub">Thêm hoặc bớt proton, neutron, electron và quan sát mô hình Rutherford – Bohr (20 nguyên tố đầu tiên).</p>
+  <div class="grid">
+    <div class="card stage">
+      <svg id="svg" viewBox="0 0 400 400" role="img" aria-label="Mô hình nguyên tử"></svg>
+    </div>
+    <div>
+      <div class="card">
+        <div class="row"><span><span class="dot" style="background:var(--p)"></span>Proton (+)</span><span class="ctl"><button data-k="p" data-d="-1" aria-label="Bớt proton">−</button><output id="op">0</output><button data-k="p" data-d="1" aria-label="Thêm proton">+</button></span></div>
+        <div class="row"><span><span class="dot" style="background:var(--n)"></span>Neutron (không mang điện)</span><span class="ctl"><button data-k="n" data-d="-1" aria-label="Bớt neutron">−</button><output id="on">0</output><button data-k="n" data-d="1" aria-label="Thêm neutron">+</button></span></div>
+        <div class="row"><span><span class="dot" style="background:var(--e)"></span>Electron (−)</span><span class="ctl"><button data-k="e" data-d="-1" aria-label="Bớt electron">−</button><output id="oe">0</output><button data-k="e" data-d="1" aria-label="Thêm electron">+</button></span></div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <div class="info">
+          <div class="tile" aria-hidden="true"><i class="a" id="ta"></i><i class="z" id="tz"></i><i class="c" id="tc"></i><b id="ts">?</b></div>
+          <div class="meta">
+            <div id="nm"><b>Chưa có nguyên tố</b></div>
+            <div id="ma"></div>
+            <div id="cf"></div>
+          </div>
+        </div>
+        <p class="status" id="st" aria-live="polite"></p>
+        <div class="tools">
+          <button id="pause">Dừng chuyển động</button>
+          <button id="reset">Đặt lại</button>
+        </div>
+        <div class="quest">
+          <button class="pri" id="newq">Thử thách mới</button>
+          <button id="check" hidden>Kiểm tra</button>
+          <p id="qt" style="margin:8px 0 2px"></p>
+          <p class="msg" id="qm" aria-live="polite"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+var EL=[null,["H","Hiđro"],["He","Heli"],["Li","Liti"],["Be","Beri"],["B","Bo"],["C","Cacbon"],["N","Nitơ"],["O","Oxi"],["F","Flo"],["Ne","Neon"],["Na","Natri"],["Mg","Magie"],["Al","Nhôm"],["Si","Silic"],["P","Photpho"],["S","Lưu huỳnh"],["Cl","Clo"],["Ar","Agon"],["K","Kali"],["Ca","Canxi"]];
+var CAP=[2,8,8,2],R=[62,96,130,164],MAX={p:20,n:24,e:20},NS="http://www.w3.org/2000/svg";
+var S={p:0,n:0,e:0},paused=false,target=0,svg=document.getElementById("svg"),eln=[],t0=0,tNow=0;
+var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+if(reduce){paused=true;document.getElementById("pause").textContent="Bật chuyển động"}
+function $(i){return document.getElementById(i)}
+function mk(tag,attrs){var x=document.createElementNS(NS,tag);for(var k in attrs)x.setAttribute(k,attrs[k]);return x}
+function shells(e){var r=e,o=[];CAP.forEach(function(c){var k=Math.min(c,r);o.push(k);r-=k});return o}
+function css(v){return "var(--"+v+")"}
+function render(){
+  svg.innerHTML="";eln=[];
+  R.forEach(function(r){svg.appendChild(mk("circle",{cx:200,cy:200,r:r,fill:"none",stroke:css("line"),"stroke-width":1.5,"stroke-dasharray":"4 5"}))});
+  var list=[],m=Math.max(S.p,S.n);
+  for(var i=0;i<m;i++){if(i<S.p)list.push("p");if(i<S.n)list.push("n")}
+  list.forEach(function(k,i){var rr=5.6*Math.sqrt(i+.5),a=i*2.39996;
+    svg.appendChild(mk("circle",{cx:200+rr*Math.cos(a),cy:200+rr*Math.sin(a),r:6.2,fill:css(k),stroke:css("panel"),"stroke-width":1}))});
+  if(!list.length){var tx=mk("text",{x:200,y:206,"text-anchor":"middle",class:"empty"});tx.textContent="Thêm hạt để bắt đầu";svg.appendChild(tx)}
+  shells(S.e).forEach(function(c,s){for(var j=0;j<c;j++){
+    var el=mk("circle",{r:6,fill:css("e"),stroke:css("panel"),"stroke-width":1.5});svg.appendChild(el);
+    eln.push({el:el,s:s,ph:2*Math.PI*j/c+s*.9})}});
+  place(tNow);info();
+}
+function place(t){eln.forEach(function(o){var a=o.ph+t*[0.9,0.6,0.45,0.3][o.s];
+  o.el.setAttribute("cx",200+R[o.s]*Math.cos(a));o.el.setAttribute("cy",200+R[o.s]*Math.sin(a))})}
+function loop(ts){if(!t0)t0=ts;if(!paused){tNow+=(ts-t0)/1000;place(tNow)}t0=ts;requestAnimationFrame(loop)}
+function info(){
+  $("op").textContent=S.p;$("on").textContent=S.n;$("oe").textContent=S.e;
+  var el=EL[S.p],ch=S.p-S.e,A=S.p+S.n,cfg=shells(S.e).filter(function(x){return x>0}).join(", ");
+  $("ts").textContent=el?el[0]:"?";$("ta").textContent=S.p?A:"";$("tz").textContent=S.p||"";
+  $("tc").textContent=ch===0?"":(ch>0?(ch>1?ch:"")+"+":(ch<-1?-ch:"")+"−");
+  $("nm").innerHTML="<b>"+(el?el[1]+" ("+el[0]+")":"Chưa có nguyên tố")+"</b>";
+  $("ma").textContent="Số proton (Z) = "+S.p+" · Số khối (A) = "+A;
+  $("cf").textContent="Electron mỗi lớp: "+(cfg||"chưa có");
+  $("st").textContent=!S.p?"Cần ít nhất 1 proton để có nguyên tố.":ch===0?"Nguyên tử trung hòa về điện.":ch>0?"Ion dương: số proton nhiều hơn electron "+ch+".":"Ion âm: số electron nhiều hơn proton "+(-ch)+".";
+}
+document.querySelectorAll("button[data-k]").forEach(function(b){b.addEventListener("click",function(){
+  var k=b.dataset.k,v=S[k]+ +b.dataset.d;if(v<0||v>MAX[k])return;S[k]=v;render()})});
+$("pause").addEventListener("click",function(){paused=!paused;this.textContent=paused?"Bật chuyển động":"Dừng chuyển động"});
+$("reset").addEventListener("click",function(){S={p:0,n:0,e:0};$("qm").textContent="";render()});
+$("newq").addEventListener("click",function(){var z=target;while(z===target)z=1+Math.floor(Math.random()*18);target=z;
+  $("qt").textContent="Lắp nguyên tử trung hòa của nguyên tố "+EL[z][1]+" ("+EL[z][0]+").";$("qm").textContent="";$("qm").className="msg";$("check").hidden=false});
+$("check").addEventListener("click",function(){var m=$("qm");
+  if(S.p!==target){m.textContent="Chưa đúng: kiểm tra lại số proton.";m.className="msg bad"}
+  else if(S.e!==target){m.textContent="Số proton đã đúng, nhưng nguyên tử chưa trung hòa về điện.";m.className="msg bad"}
+  else{m.textContent="Chính xác! Electron mỗi lớp: "+shells(S.e).filter(Boolean).join(", ")+".";m.className="msg ok"}});
+render();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
